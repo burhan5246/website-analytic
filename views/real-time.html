@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="style.css"></link>
+    <title>Real Time</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.1/socket.io.min.js" integrity="sha512-gVG6WRMUYFaIdoocaxbqd02p3DUbhReTBWc7NTGB96i7vONrr7GuCZJHFFmkXEhpwilIWUnfRIMSlKaApwd/jg==" crossorigin="anonymous"></script>	
+    <script>
+        var list = {};
+        const socket = io('ws://localhost:3000', {transports: ['websocket']});
+        socket.emit('realtime', null);
+        socket.on('getRealTime', function (data) { 
+            list = {};            
+            for (const i in data) {
+                if(!Array.isArray(list[data[i].hostname])){
+                    list[data[i].hostname] = [];
+                }
+                
+                list[data[i].hostname].push(data[i]);
+                
+            }
+            
+            listOnline(list);    
+            
+        });
+
+        function listOnline(list){
+            var c = document.getElementById("retimeList"); 
+            c.innerHTML = "";           
+            for (const j in list) {
+                var ips = `<ul>`;
+                for (const host of list[j]) {
+                    ips += `<li>${host.ip}</li>`;                    
+                }
+
+                ips += `</ul>`;
+                c.insertAdjacentHTML('beforeend', `<li>${list[j][0].hostname} - ${list[j].length} Online ${ips}</li>`);
+            }
+        }
+    </script>
+
+</head>
+<body>
+    <div class="nav">
+        <input type="checkbox" id="nav-check">
+        <div class="nav-header">
+          <div class="nav-title">
+            Website Analytic
+          </div>
+        </div>
+        <div class="nav-btn">
+          <label for="nav-check">
+            <span></span>
+            <span></span>
+            <span></span>
+          </label>
+        </div>
+
+
+        
+        <div class="nav-links">
+            <a href="/" >Home</a>  
+          <a href="/real-time" >Live Traffic</a>
+          <a href="/all-traffic" >All Traffic</a>
+        </div>
+      </div>
+      <div class="container">
+    <h1>Real Time</h1>
+    <div >
+        <ul id="retimeList">
+            
+        </ul>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.22/css/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+    <link rel="stylesheet" href="style.css"></link>
+    <title>All Traffic</title>
+</head>
+
+<body>
+    <div class="nav">
+        <input type="checkbox" id="nav-check">
+        <div class="nav-header">
+          <div class="nav-title">
+            Website Analytic
+          </div>
+        </div>
+        <div class="nav-btn">
+          <label for="nav-check">
+            <span></span>
+            <span></span>
+            <span></span>
+          </label>
+        </div>
+        
+        <div class="nav-links">
+            <a href="/" >Home</a>   
+          <a href="/real-time" >Live Traffic</a>
+          <a href="/all-traffic" >All Traffic</a>
+        </div>
+      </div>
+    <div class="container">
+    <h1>All Traffic List</h1>
+      <div class="row">
+        <div class="col-md-4">
+        <div class="form-group">
+          <label for="sel1">Hostname:</label>
+          <select class="form-control" id="hostname">
+            <option value="">All</option>
+          </select>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="form-group">
+            <label for="sel1">DateTime:</label>
+            <input type="text" class="form-control" name="datetimes" id="datetimes"/>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="form-group">
+              <button class="btn btn-info" style="margin-top: 23px;" onclick="handleFilter()">Filter</button>
+            </div>
+            </div>
+        </div>
+
+
+
+    <table id="trafficList" class="table table-striped table-bordered">
+      <thead>
+        <tr>
+            <th>Hostname</th>
+            <th>URL</th>
+            <th>IP</th>
+            <th>Created At (UTC)</th>            
+        </tr>
+    </thead>
+    </table>
+</div>  
+   
+</body>
+<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.22/js/dataTables.bootstrap.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+<script>
+var myHeaders = new Headers();
+myHeaders.append("Content-Type", "application/json");
+function fetchData(method, path, data){
+  return new Promise((resolve, reject) => {  
+    var requestOptions = {
+      method: method,
+      headers: myHeaders,
+    };
+
+    if(method === "POST"){
+      requestOptions.body = JSON.stringify(data)
+    }
+
+    fetch(`/api/${path}`, requestOptions)
+      .then(response => response.json())
+      .then(result => resolve(result.response))
+      .catch(error => reject(error));
+
+  });  
+}
+
+async function handleFilter(){
+  try {
+    let datetime = $("#datetimes").val();
+    let hostname = $("#hostname").val();
+    let hostnames = await fetchData("POST", "visitors", {hostname,datetime});
+    $("#trafficList").DataTable().destroy();
+    $('#trafficList').DataTable({
+        data: hostnames,
+        columns : [
+            { data : "hostname" },
+            { data : "uri" },
+            { data : "ip" },
+            { data : "createdAt" },
+        ]
+    });
+  } catch (error) {
+    alert("something went wrong");
+  }
+
+}
+
+async function init(){
+  try {
+    let hostnames = await fetchData("GET", "visitors/hostnames");
+    for (const host of hostnames) {
+      $("#hostname").append(`<option>${host}</option>`);
+    }
+  
+    let visitors = await fetchData("POST", "visitors");
+    $('#trafficList').DataTable({
+        data: visitors,
+        columns : [
+            { data : "hostname" },
+            { data : "uri" },
+            { data : "ip" },
+            { data : "createdAt" },
+        ]
+    });
+  } catch (error) {
+    alert("something went wrong");
+  }
+}  
+
+
+
+$(function() {
+  init();
+  $('input[name="datetimes"]').daterangepicker({
+    timePicker: true,
+    locale: {
+      format: 'YYYY-MM-DD hh:mm:ss'
+    }
+  });
+});
+
+</script>
+</html>

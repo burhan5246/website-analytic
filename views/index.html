@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="style.css"></link>
+    <title>Dashboard</title>
+</head>
+
+<body>
+    <div class="nav">
+        <input type="checkbox" id="nav-check">
+        <div class="nav-header">
+          <div class="nav-title">
+            Website Analytic
+          </div>
+        </div>
+        <div class="nav-btn">
+          <label for="nav-check">
+            <span></span>
+            <span></span>
+            <span></span>
+          </label>
+        </div>
+        
+        <div class="nav-links">
+            <a href="/" >Home</a>   
+          <a href="/real-time" >Live Traffic</a>
+          <a href="/all-traffic" >All Traffic</a>
+        </div>
+      </div>
+      <div class="container">
+    <h1>Add this code in the <code>&lt;head&gt;</code> tag</h1>
+     <code id="scriptCode">
+        
+     </code>   
+    </div>
+</body>
+<script>
+
+    document.getElementById("scriptCode").insertAdjacentHTML('beforeend', `&lt;script src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.1/socket.io.min.js' crossorigin='anonymous'&gt;&lt;/script&gt;&lt;script&gt; const socket = io('ws://${location.origin.split("//")[1]}', {transports: ['websocket']}); function tracking(json){ socket.emit('visit', {hostname: location.hostname, url:location.href, ip:json.ip}); } &lt;/script&gt;&lt;script src='https://api.ipify.org?format=jsonp&callback=tracking'&gt;&lt;/script&gt;`);
+    
+</script>
+</html>
