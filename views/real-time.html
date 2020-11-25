@@ -9,7 +9,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.1/socket.io.min.js" integrity="sha512-gVG6WRMUYFaIdoocaxbqd02p3DUbhReTBWc7NTGB96i7vONrr7GuCZJHFFmkXEhpwilIWUnfRIMSlKaApwd/jg==" crossorigin="anonymous"></script>	
     <script>
         var list = {};
-        const socket = io('ws://localhost:3000', {transports: ['websocket']});
+        const socket = io(`ws://${location.origin.split("//")[1]}`, {transports: ['websocket']});
         socket.emit('realtime', null);
         socket.on('getRealTime', function (data) { 
             list = {};            
