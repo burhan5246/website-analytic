@@ -1,13 +1,22 @@
-const express = require("express");
+var fs = require("fs");
+var app = require("express")();
+var https = require("https");
+var server = https.createServer(
+  {
+    key: fs.readFileSync("privkey.pem"),
+    cert: fs.readFileSync("fullchain.pem"),
+  },
+  app
+);
 const cors = require("cors");
 var bodyParser = require("body-parser");
-const app = express();
-var http = require("http").Server(app);
-var https = require("https");
-var io = require("socket.io")(http);
 const connectDB = require("./config/db");
 const Visitor = require("./models/Visitors");
+
 const port = process.env.PORT || 3000;
+server.listen(port);
+
+var io = require("socket.io").listen(server);
 
 //connect db
 connectDB();
